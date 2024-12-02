@@ -27,7 +27,7 @@ COPY --from=builder /src/production-code/daemon/ /opt/mcsmanager/daemon/
 
 RUN npm install --production
 
-EXPOSE 24444
+EXPOSE 9003
 
 ENV MCSM_INSTANCES_BASE_PATH=/opt/mcsmanager/daemon/data/InstanceData
 

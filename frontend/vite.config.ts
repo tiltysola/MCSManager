@@ -48,16 +48,16 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:23333",
+        target: "http://localhost:9002",
         changeOrigin: true,
         ws: true
       },
       "/upload_files": {
-        target: "http://localhost:23333",
+        target: "http://localhost:9002",
         changeOrigin: true
       },
       "/socket.io": {
-        target: "ws://localhost:23333",
+        target: "ws://localhost:9002",
         ws: true
       }
     }

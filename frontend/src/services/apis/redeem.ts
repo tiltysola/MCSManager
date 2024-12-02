@@ -49,7 +49,7 @@ export interface PurchaseQueryResponse {
 }
 
 export const CURRENT_PANEL_ADDR = window.location.host.includes("localhost")
-  ? "http://localhost:23333/"
+  ? "http://localhost:9002/"
   : `${window.location.protocol}//${window.location.host}/`;
 
 export const requestRedeemPlatform = useDefineApi<

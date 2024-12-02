@@ -79,7 +79,7 @@ function formatInstanceData(instance: IAdvancedInstanceInfo): IInstanceInfoProto
   let portRules: Array<IPortInfo> = [];
   if (ports?.length > 0) {
     ports.forEach((line: string) => {
-      // line = "23333:24444/tcp"
+      // line = "9002:9003/tcp"
       const [ports, protocol] = line.split("/");
       if (!ports || !protocol) return;
       const [host, container] = ports.split(":");

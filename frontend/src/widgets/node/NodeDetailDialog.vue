@@ -23,7 +23,7 @@ const openDialog = (data?: RemoteNodeDetail, uuid?: string) => {
     editMode.value = false;
     dialog.data = {
       ip: "",
-      port: 24444,
+      port: 9003,
       prefix: "",
       remarks: "",
       apiKey: ""
@@ -39,7 +39,7 @@ const dialog = reactive({
   uuid: "",
   data: {
     ip: "",
-    port: 24444,
+    port: 9003,
     prefix: "",
     remarks: "",
     apiKey: ""
@@ -57,7 +57,7 @@ const dialog = reactive({
   clear: () => {
     dialog.data = {
       ip: "",
-      port: 24444,
+      port: 9003,
       prefix: "",
       remarks: "",
       apiKey: ""

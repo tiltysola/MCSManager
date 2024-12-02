@@ -133,7 +133,7 @@ tar -zxf mcsmanager_linux_release.tar.gz
 
 ./start-web.sh
 
-# 進入 http://localhost:23333/ 開始使用
+# 進入 http://localhost:9002/ 開始使用
 
 # 一般來說，網頁服務會自動掃描並連接到本機節點。
 

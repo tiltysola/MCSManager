@@ -17,7 +17,7 @@ COPY --from=builder /src/production-code/web/ /opt/mcsmanager/web/
 
 RUN npm install --production
 
-EXPOSE 23333
+EXPOSE 9002
 
 VOLUME ["/opt/mcsmanager/web/data", "/opt/mcsmanager/web/logs"]
 

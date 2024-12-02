@@ -40,7 +40,7 @@ class RemoteServiceSubsystem extends UniversalRemoteSubsystem<RemoteService> {
   // Like: this.registerRemoteService({
   // ip: "127.0.0.1",
   // apiKey: "test_key",
-  // port: 24444
+  // port: 9003
   // });
   async registerRemoteService(config: IRemoteService) {
     const instance = await this.newInstance(config);
@@ -102,7 +102,7 @@ class RemoteServiceSubsystem extends UniversalRemoteSubsystem<RemoteService> {
       const localPort = localDaemonConfig.port;
       return await this.registerRemoteService({ apiKey: localKey, port: localPort, ip });
     } else if (key) {
-      const port = 24444;
+      const port = 9003;
       return await this.registerRemoteService({ apiKey: key, port, ip });
     }
     logger.warn($t("TXT_CODE_systemRemoteService.error"));

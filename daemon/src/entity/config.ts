@@ -12,7 +12,7 @@ function builderPassword() {
 class Config {
   public version = 2;
   public ip = "";
-  public port = 24444;
+  public port = 9003;
   public prefix = "";
   public key = builderPassword();
   public maxFileTask = 2;

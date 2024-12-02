@@ -3,7 +3,7 @@ services:
   web:
     image: githubyumao/mcsmanager-web:latest
     ports:
-      - "23333:23333"
+      - "9002:9002"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - <CHANGE_ME_TO_INSTALL_PATH>/web/data:/opt/mcsmanager/web/data
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     network_mode: host # if you want run instance in daemon container
     # ports:
-    #   - "24444:24444"
+    #   - "9003:9003"
     environment:
       - MCSM_DOCKER_WORKSPACE_PATH=<CHANGE_ME_TO_INSTALL_PATH>/daemon/data/InstanceData
     volumes:

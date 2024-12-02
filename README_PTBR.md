@@ -124,7 +124,7 @@ tar -zxf mcsmanager_linux_release.tar.gz
 # Inicie a interface web no segundo terminal ou tela.
 ./start-web.sh
 
-# Para acessar a web, vá para http://localhost:23333/
+# Para acessar a web, vá para http://localhost:9002/
 # Geralmente, a interface web irá escanear e adicionar automaticamente o daemon local.
 ```
 

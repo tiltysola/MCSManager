@@ -1,7 +1,7 @@
 // @Entity
 export default class SystemConfig {
   // HTTP service port, IP and path prefix
-  httpPort: number = 23333;
+  httpPort: number = 9002;
   httpIp: string = "";
   prefix: string = "";
 

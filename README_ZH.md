@@ -119,7 +119,7 @@ tar -zxf mcsmanager_linux_release.tar.gz
 # 启动网络服务(在第二个终端或screen)
 ./start-web.sh
 
-# 为网络界面访问http://localhost:23333/
+# 为网络界面访问http://localhost:9002/
 # 一般来说，网络应用会自动扫描并连接到本地守护进程。
 ```
 

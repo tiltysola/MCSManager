@@ -123,7 +123,7 @@ tar -zxf mcsmanager_linux_release.tar.gz
 # daemon実行したら、二つ目のターミナルでウェブを実行します。
 ./start-web.sh
 
-# ウェブのアドレスは http://localhost:23333/
+# ウェブのアドレスは http://localhost:9002/
 # ウェブは自動的に同じデバイスインストールしたdaemonを検測して、追加します。
 ```
 

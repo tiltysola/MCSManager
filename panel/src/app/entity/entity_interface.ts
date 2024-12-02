@@ -47,7 +47,7 @@ export interface IRemoteService {
 // @Entity
 export class RemoteServiceConfig {
   public ip = "";
-  public port = 24444;
+  public port = 9003;
   public prefix = "";
   public remarks = "";
   public apiKey = "";
