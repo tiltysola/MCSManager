@@ -1308,7 +1308,6 @@
   "TXT_CODE_3b1bb444": "Min",
   "TXT_CODE_76750199": "Toda Semana",
   "TXT_CODE_6cb9bb04": "Mês",
-  "TXT_CODE_ca923eba": "Dia",
   "TXT_CODE_2d542e4c": "Nome da Tarefa",
   "TXT_CODE_1544562": "Carga",
   "TXT_CODE_485e2d41": "Contagem Restante",
@@ -1973,7 +1972,6 @@
   "TXT_CODE_60dd05d5": "Substituir o diretório de trabalho da imagem padrão pelo diretório de armazenamento de dados",
   "TXT_CODE_6259357c": "O programa deve ser executado por mais de 6 segundos antes de poder ser forçado a parar!",
   "TXT_CODE_6c232c9c": "Usado para montar pastas adicionais no host no contêiner, suporta duas strings variáveis:",
-  "TXT_CODE_708c10e2": "Lista de pacotes",
   "TXT_CODE_75bf9192": "Usar código",
   "TXT_CODE_8028e95b": "Digite seu nome de usuário do painel, uma nova conta será criada se não existir",
   "TXT_CODE_8074a178": "Nova data de validade:",
@@ -2011,5 +2009,15 @@
   "TXT_CODE_f94e428a": "Usuário cancelado",
   "TXT_CODE_fa487a47": "Forneça as seguintes strings variáveis:",
   "TXT_CODE_fb87ccd": "Código da Instância",
-  "TXT_CODE_ffda3755": "Insira o código"
+  "TXT_CODE_ffda3755": "Insira o código",
+  "TXT_CODE_afabf3ca": "Falha na análise do tempo",
+  "TXT_CODE_10088738": "Confirmar exclusão",
+  "TXT_CODE_1548649e": "Editar tarefas agendadas",
+  "TXT_CODE_1981470a": "Se você optar por excluir os arquivos relacionados à instância ao mesmo tempo, todo o diretório onde a instância está localizada será excluído diretamente.",
+  "TXT_CODE_584d786d": "Exclua a instância e os arquivos relacionados",
+  "TXT_CODE_7542201a": "Exclua também os arquivos relacionados à instância",
+  "TXT_CODE_90508729": "Esta operação excluirá diretamente todo o diretório onde a instância está localizada e os arquivos não poderão ser restaurados. Deseja continuar?",
+  "TXT_CODE_a0e19f38": "Excluir instância",
+  "TXT_CODE_ed81f72d": "Esta instância não foi comprada em uma loja e não pode ser renovada. Entre em contato com o comerciante para processamento!",
+  "TXT_CODE_f486dbb4": "Instância excluída com sucesso"
 }
