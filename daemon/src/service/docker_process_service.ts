@@ -172,6 +172,7 @@ export class SetupDockerContainer extends AsyncTask {
     const docker = new DefaultDocker();
     this.container = await docker.createContainer({
       name: containerName,
+      User: '1000',
       Hostname: containerName,
       Image: instance.config.docker.image,
       AttachStdin: true,
