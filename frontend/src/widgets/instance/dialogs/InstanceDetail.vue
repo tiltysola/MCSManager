@@ -85,12 +85,7 @@ const isGlobalTerminal = computed(() => {
 const isDockerMode = computed(() => options.value?.config.processType === "docker");
 
 const loadImages = async () => {
-  // Init options
   dockerImages.value = [
-    {
-      label: t("TXT_CODE_3362d4b7"),
-      value: IMAGE_DEFINE.NEW
-    },
     {
       label: t("TXT_CODE_435f4975"),
       value: IMAGE_DEFINE.EDIT
@@ -269,7 +264,7 @@ defineExpose({
     v-model:open="open"
     centered
     :mask-closable="false"
-    :width="isPhone ? '100%' : '1600px'"
+    :width="isPhone ? '100%' : '1200px'"
     :title="t('TXT_CODE_aac98b2a')"
     :confirm-loading="isLoading"
     :ok-text="t('TXT_CODE_abfe9512')"
@@ -503,21 +498,6 @@ defineExpose({
               </a-form-item>
             </a-col>
 
-            <a-col :xs="24" :lg="16" :offset="0">
-              <a-form-item>
-                <a-typography-title :level="5">{{ t("TXT_CODE_81979d0f") }}</a-typography-title>
-                <a-typography-paragraph>
-                  <a-typography-text type="secondary" :class="!isPhone && 'two-line-height'">
-                    {{ t("TXT_CODE_c800cb31") }}
-                  </a-typography-text>
-                </a-typography-paragraph>
-                <a-input
-                  v-model:value="options.config.docker.workingDir"
-                  :placeholder="t('TXT_CODE_2082f659')"
-                />
-              </a-form-item>
-            </a-col>
-
             <a-col :xs="24" :lg="8" :offset="0">
               <a-form-item name="changeWorkdir">
                 <a-typography-title :level="5" :class="{ 'require-field': isDockerMode }">
@@ -537,6 +517,21 @@ defineExpose({
                   <template #checkedChildren><check-outlined /></template>
                   <template #unCheckedChildren><close-outlined /></template>
                 </a-switch>
+              </a-form-item>
+            </a-col>
+
+            <a-col :xs="24" :lg="16" :offset="0">
+              <a-form-item>
+                <a-typography-title :level="5">{{ t("TXT_CODE_81979d0f") }}</a-typography-title>
+                <a-typography-paragraph>
+                  <a-typography-text type="secondary" :class="!isPhone && 'two-line-height'">
+                    {{ t("TXT_CODE_c800cb31") }}
+                  </a-typography-text>
+                </a-typography-paragraph>
+                <a-input
+                  v-model:value="options.config.docker.workingDir"
+                  :placeholder="t('TXT_CODE_2082f659')"
+                />
               </a-form-item>
             </a-col>
 

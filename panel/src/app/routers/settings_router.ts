@@ -35,8 +35,10 @@ router.put("/setting", permission({ level: ROLE.ADMIN }), async (ctx) => {
     if (config.httpIp != null) systemConfig.httpIp = config.httpIp;
     if (config.httpPort != null) systemConfig.httpPort = config.httpPort;
     if (config.prefix != null) systemConfig.prefix = config.prefix;
-    if (config.reverseProxyMode != null)
+    if (config.reverseProxyMode != null) {
       systemConfig.reverseProxyMode = Boolean(config.reverseProxyMode);
+      ctx.app.proxy = systemConfig.reverseProxyMode;
+    }
     if (config.crossDomain != null) systemConfig.crossDomain = config.crossDomain;
     if (config.gzip != null) systemConfig.gzip = config.gzip;
     if (config.maxCompress != null) systemConfig.maxCompress = config.maxCompress;
@@ -50,6 +52,7 @@ router.put("/setting", permission({ level: ROLE.ADMIN }), async (ctx) => {
     if (config.allowUsePreset != null) systemConfig.allowUsePreset = Boolean(config.allowUsePreset);
     if (config.presetPackAddr != null) systemConfig.presetPackAddr = String(config.presetPackAddr);
     if (config.businessMode != null) systemConfig.businessMode = Boolean(config.businessMode);
+    if (config.businessId != null) systemConfig.businessId = String(config.businessId);
     if (config.language != null) {
       logger.warn($t("TXT_CODE_e29a9317"), config.language);
       systemConfig.language = String(config.language);
