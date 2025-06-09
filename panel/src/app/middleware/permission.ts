@@ -1,5 +1,5 @@
 import Koa from "koa";
-import { GlobalVariable } from "common";
+import { GlobalVariable } from "mcsmanager-common";
 import userSystem from "../service/user_service";
 import { getUuidByApiKey, ILLEGAL_ACCESS_KEY, isAjax, logout } from "../service/passport_service";
 import { $t } from "../i18n";
@@ -21,7 +21,7 @@ function requestSpeedLimit(ctx: Koa.ParameterizedContext) {
 }
 
 // Failed callback
-function verificationFailed(ctx: Koa.ParameterizedContext) {
+export function verificationFailed(ctx: Koa.ParameterizedContext) {
   ctx.status = 403;
   ctx.body = `[Forbidden] ${$t("TXT_CODE_permission.forbidden")}`;
 }

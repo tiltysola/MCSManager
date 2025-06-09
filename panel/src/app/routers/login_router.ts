@@ -8,7 +8,7 @@ import userSystem, { TwoFactorError } from "../service/user_service";
 import { logger } from "../service/log";
 import { $t } from "../i18n";
 import axios from "axios";
-import { GlobalVariable } from "common";
+import { GlobalVariable } from "mcsmanager-common";
 import { ROLE } from "../entity/user";
 import SystemConfig from "../entity/setting";
 
@@ -79,7 +79,8 @@ router.all(
         canFileManager: systemConfig?.canFileManager || false,
         allowUsePreset: systemConfig?.allowUsePreset || false,
         businessMode: systemConfig?.businessMode || false,
-        businessId: systemConfig?.businessId || null
+        businessId: systemConfig?.businessId || null,
+        allowChangeCmd: systemConfig?.allowChangeCmd || false
       } as Partial<SystemConfig>
     };
   }
