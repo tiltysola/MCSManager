@@ -189,8 +189,7 @@ export class SetupDockerContainer extends AsyncTask {
     logger.info(`NET_ALIASES: ${JSON.stringify(dockerConfig.networkAliases)}`);
 
     logger.info(
-      `MEM_LIMIT: ${maxMemory ? (maxMemory / 1024 / 1024).toFixed(2) : "--"} MB, Swap: ${
-        memorySwap ? (memorySwap / 1024 / 1024).toFixed(2) : "--"
+      `MEM_LIMIT: ${maxMemory ? (maxMemory / 1024 / 1024).toFixed(2) : "--"} MB, Swap: ${memorySwap ? (memorySwap / 1024 / 1024).toFixed(2) : "--"
       } MB`
     );
     logger.info(`TYPE: Docker Container`);
@@ -238,7 +237,7 @@ export class SetupDockerContainer extends AsyncTask {
       Entrypoint: entrypoint,
       Cmd: startCmd,
       name: containerName,
-      User: '1000',
+      // User: '1000',
       Hostname: containerName,
       Image: dockerConfig.image,
       AttachStdin: true,
@@ -276,14 +275,14 @@ export class SetupDockerContainer extends AsyncTask {
       // host mode uses the host's network stack and doesn't support EndpointsConfig
       ...(dockerConfig.networkMode !== "host" &&
         dockerConfig.networkMode !== "none" && {
-          NetworkingConfig: {
-            EndpointsConfig: {
-              [dockerConfig.networkMode || "bridge"]: {
-                Aliases: dockerConfig.networkAliases
-              }
+        NetworkingConfig: {
+          EndpointsConfig: {
+            [dockerConfig.networkMode || "bridge"]: {
+              Aliases: dockerConfig.networkAliases
             }
           }
-        })
+        }
+      })
     });
 
     await this.container.start();
@@ -295,10 +294,10 @@ export class SetupDockerContainer extends AsyncTask {
   public async onStop() {
     try {
       await this.container?.kill();
-    } catch (error) {}
+    } catch (error) { }
     try {
       await this.container?.remove();
-    } catch (error) {}
+    } catch (error) { }
   }
 
   public getContainer() {
@@ -326,9 +325,9 @@ export class SetupDockerContainer extends AsyncTask {
     }
   }
 
-  public async onError(err: Error) {}
+  public async onError(err: Error) { }
 
-  public toObject() {}
+  public toObject() { }
 }
 
 // SubProcess adapter for Instance
@@ -386,7 +385,7 @@ export class DockerProcessAdapter extends EventEmitter implements IInstanceProce
   public async destroy() {
     try {
       await this.container?.remove();
-    } catch (error: any) {}
+    } catch (error: any) { }
   }
 
   private wait() {
