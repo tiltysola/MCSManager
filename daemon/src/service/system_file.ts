@@ -163,6 +163,16 @@ export default class FileManager {
     if (!this.check(fileName)) throw new Error(ERROR_MSG_01);
     const absPath = this.toAbsolutePath(fileName);
     const buf = await fs.readFile(absPath);
+
+    // 检测是否为二进制文件（如 .dat NBT 文件）
+    const isBinaryFile = /\.(dat|bin|nbt|zip|jar|gz|tar|rar|7z)$/i.test(fileName);
+
+    if (isBinaryFile) {
+      // 对于二进制文件，返回 base64 编码的字符串，避免 iconv 解码损坏数据
+      return buf.toString('base64');
+    }
+
+    // 对于文本文件，使用 iconv 解码
     const text = iconv.decode(buf, this.fileCode || "utf-8");
     return text;
   }
@@ -170,6 +180,17 @@ export default class FileManager {
   async writeFile(fileName: string, data: string) {
     if (!this.check(fileName)) throw new Error(ERROR_MSG_01);
     const absPath = this.toAbsolutePath(fileName);
+
+    // 检测是否为二进制文件（如 .dat NBT 文件）
+    const isBinaryFile = /\.(dat|bin|nbt|zip|jar|gz|tar|rar|7z)$/i.test(fileName);
+
+    if (isBinaryFile) {
+      // 对于二进制文件，data 应该是 base64 编码的字符串，直接解码为 Buffer
+      const buf = Buffer.from(data, 'base64');
+      return await fs.writeFile(absPath, buf);
+    }
+
+    // 对于文本文件，使用 iconv 编码
     const buf = iconv.encode(data, this.fileCode || "utf-8");
     return await fs.writeFile(absPath, buf);
   }
@@ -240,7 +261,7 @@ export default class FileManager {
         filesPath.push(this.toAbsolutePath(iterator));
         try {
           totalSize += fs.statSync(this.toAbsolutePath(iterator))?.size;
-        } catch (error: any) {}
+        } catch (error: any) { }
       }
     }
     if (totalSize > MAX_TOTAL_FIELS_SIZE)
