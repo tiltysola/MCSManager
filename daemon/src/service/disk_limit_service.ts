@@ -44,21 +44,26 @@ class DiskLimitService {
   async #startCheck() {
     if (this.checking) return;
     this.checking = true;
-    for (let i = 0; i < this.concurrent; i++) {
-      const item = this.queue.pop();
-      if (item) {
-        this.checkDiskNow(item);
+    try {
+      const promises = [];
+      for (let i = 0; i < this.concurrent; i++) {
+        const item = this.queue.pop();
+        if (item) {
+          promises.push(this.checkDiskNow(item));
+        }
       }
+      await Promise.all(promises);
+    } finally {
+      this.checking = false;
     }
-    this.checking = false;
   }
 
   async #stopInstance(instance: Instance) {
     if (instance.status() === Instance.STATUS_RUNNING) {
       const startCount = instance.startCount;
       instance.execPreset("stop");
-      await sleep(1000 * 60);
-      if (instance.status() === Instance.STATUS_RUNNING && startCount === instance.startCount) {
+      await sleep(1000 * 10);
+      if (instance.status() !== Instance.STATUS_STOP && startCount === instance.startCount) {
         instance.println("ERROR", $t("TXT_CODE_8418e7fe"));
         instance
           .execPreset("kill")
@@ -103,10 +108,7 @@ class DiskLimitService {
               storageUsage: convertBytesToGB(storageUsage)
             })
           );
-          instance.println(
-            "WARNING",
-            $t("TXT_CODE_d448d98d")
-          );
+          instance.println("WARNING", $t("TXT_CODE_d448d98d"));
           await sleep(200);
         }
         this.#stopInstance(instance);

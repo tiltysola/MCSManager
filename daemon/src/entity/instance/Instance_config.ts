@@ -65,6 +65,8 @@ export default class InstanceConfig implements IGlobalInstanceConfig {
     updateCommandImage: "",
     containerName: "",
     image: "",
+    uploadSpeedLimit: 0,
+    downloadSpeedLimit: 0,
     ports: [],
     extraVolumes: [],
     capAdd: [],
@@ -84,7 +86,11 @@ export default class InstanceConfig implements IGlobalInstanceConfig {
     workingDir: "/data",
     env: [],
     changeWorkdir: true,
-    labels: []
+    labels: [],
+    gpuEnabled: false,
+    gpuCount: -1,
+    gpuDeviceIds: [],
+    gpuDriver: "nvidia"
   };
 
   public pingConfig = {

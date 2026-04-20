@@ -14,6 +14,7 @@ import { IInstanceProcess } from "../entity/instance/interface";
 import { $t } from "../i18n";
 import { AsyncTask } from "./async_task_service";
 import logger from "./log";
+import { NetworkLimitService } from "./network_limit_service";
 import InstanceSubsystem from "./system_instance";
 
 type PublicPortArray = {
@@ -190,6 +191,80 @@ export class SetupDockerContainer extends AsyncTask {
 
     const privileged = dockerConfig.privileged || false;
 
+    // GPU DeviceRequests
+    let gpuDeviceRequests: any[] | undefined = undefined;
+    if (dockerConfig.gpuEnabled) {
+      const gpuCount = dockerConfig.gpuCount ?? -1;
+      const gpuDeviceIds = dockerConfig.gpuDeviceIds ?? [];
+      const gpuDriver = dockerConfig.gpuDriver ?? "";
+
+      // Validate gpuCount: must be integer >= -1 and <= 128 (reasonable upper bound)
+      if (!Number.isInteger(gpuCount) || gpuCount < -1 || gpuCount > 128) {
+        throw new Error(
+          $t("TXT_CODE_gpu_invalid_count", { v: String(gpuCount) })
+        );
+      }
+
+      // Validate gpuDeviceIds: each item must be non-empty and contain only [a-zA-Z0-9_-]
+      if (gpuDeviceIds.length > 128) {
+        throw new Error(
+          $t("TXT_CODE_gpu_invalid_device_id", { v: `(${gpuDeviceIds.length} items)` })
+        );
+      }
+      const gpuIdPattern = /^[a-zA-Z0-9_-]+$/;
+      for (const id of gpuDeviceIds) {
+        if (typeof id !== "string" || !id.trim() || id.length > 128 || !gpuIdPattern.test(id)) {
+          throw new Error(
+            $t("TXT_CODE_gpu_invalid_device_id", { v: id })
+          );
+        }
+      }
+
+      // Validate gpuDriver: if set, must contain only letters and digits, max 32 chars
+      if (gpuDriver && (gpuDriver.length > 32 || !/^[a-zA-Z0-9]+$/.test(gpuDriver))) {
+        throw new Error(
+          $t("TXT_CODE_gpu_invalid_driver", { v: gpuDriver })
+        );
+      }
+
+      // Conflict check: gpuDeviceIds and gpuCount > 0 are mutually exclusive
+      if (gpuDeviceIds.length > 0 && gpuCount > 0) {
+        throw new Error($t("TXT_CODE_gpu_conflict_count_and_ids"));
+      }
+
+      // Conflict check: gpuCount === 0 and no deviceIds => effectively disabled
+      if (gpuCount === 0 && gpuDeviceIds.length === 0) {
+        logger.warn(
+          `[SetupDockerContainer] GPU enabled but gpuCount=0 and no deviceIds specified, GPU will not be allocated. Instance: ${instance.instanceUuid}`
+        );
+      } else {
+        // Warn if privileged mode is also enabled
+        if (privileged) {
+          logger.warn(
+            `[SetupDockerContainer] GPU passthrough is configured alongside privileged mode. ` +
+            `In privileged mode the container already has access to all host devices. Instance: ${instance.instanceUuid}`
+          );
+        }
+
+        const deviceRequest: any = {
+          Driver: gpuDriver,
+          Capabilities: [["gpu"]],
+          Options: {}
+        };
+
+        if (gpuDeviceIds.length > 0) {
+          // Specific device IDs take priority, Count must be 0
+          deviceRequest.DeviceIDs = gpuDeviceIds;
+          deviceRequest.Count = 0;
+        } else {
+          // Allocate by count (-1 = all, positive integer = specific count)
+          deviceRequest.Count = gpuCount;
+        }
+
+        gpuDeviceRequests = [deviceRequest];
+      }
+    }
+
     let cwd = instance.absoluteCwdPath();
     const defaultInstanceDir = InstanceSubsystem.getInstanceDataDir();
     const hostRealPath = toText(process.env.MCSM_DOCKER_WORKSPACE_PATH);
@@ -225,12 +300,15 @@ export class SetupDockerContainer extends AsyncTask {
     logger.info(`OPEN_PORT: ${JSON.stringify(publicPortArray)}`);
     logger.info(`Volume Mounts: ${JSON.stringify(mounts)}`);
     logger.info(`NET_ALIASES: ${JSON.stringify(dockerConfig.networkAliases)}`);
-
+    logger.info(`UPLOAD_LIMIT: ${dockerConfig.uploadSpeedLimit} KB/s`);
+    logger.info(`DOWNLOAD_LIMIT: ${dockerConfig.downloadSpeedLimit} KB/s`);
     logger.info(
       `MEM_LIMIT: ${maxMemory ? (maxMemory / 1024 / 1024).toFixed(2) : "--"} MB, Swap: ${memorySwap ? (memorySwap / 1024 / 1024).toFixed(2) : "--"
       } MB`
     );
-    logger.info(`TYPE: Docker Container`);
+    logger.info(
+      `GPU: ${gpuDeviceRequests ? JSON.stringify(gpuDeviceRequests) : "disabled"}`
+    );
 
     if (workingDir) {
       instance.println("INFO", $t("TXT_CODE_e76e49e9") + cwd + " --> " + workingDir + "\n");
@@ -273,6 +351,17 @@ export class SetupDockerContainer extends AsyncTask {
     logger.info(`Docker Version: ${dockerVersion}`);
     logger.info("----------------");
 
+    // Check if network rate limiting is enabled
+    const networkLimitService = NetworkLimitService.getInstance();
+    if (dockerConfig.uploadSpeedLimit || dockerConfig.downloadSpeedLimit) {
+      try {
+        networkLimitService.checkRequiredCommands();
+      } catch (error) {
+        instance.println("ERROR", $t("TXT_CODE_bdb9f7bb"));
+        throw error;
+      }
+    }
+
     this.container = await docker.createContainer({
       Entrypoint: entrypoint,
       Cmd: startCmd,
@@ -313,7 +402,8 @@ export class SetupDockerContainer extends AsyncTask {
         CapAdd: capAdd,
         CapDrop: capDrop,
         Devices: parsedDevices,
-        Privileged: privileged
+        Privileged: privileged,
+        DeviceRequests: gpuDeviceRequests
       },
       // Only set NetworkingConfig for non-host network modes
       // host mode uses the host's network stack and doesn't support EndpointsConfig
@@ -331,17 +421,46 @@ export class SetupDockerContainer extends AsyncTask {
 
     await this.container.start();
 
+    // Apply bandwidth limits if configured
+    if (dockerConfig && (dockerConfig.uploadSpeedLimit || dockerConfig.downloadSpeedLimit)) {
+      try {
+        await networkLimitService.setBandwidthLimit(this.container.id, {
+          uploadLimit: dockerConfig.uploadSpeedLimit,
+          downloadLimit: dockerConfig.downloadSpeedLimit
+        });
+        logger.info(
+          `Applied bandwidth limits to container ${this.container.id}, Instance: ${instance.config.nickname}`
+        );
+      } catch (error: any) {
+        instance.println("ERROR", $t("TXT_CODE_49731eec"));
+        instance.println("ERROR", $t("TXT_CODE_9c95b60f") + error.message);
+        logger.error(`Failed to apply bandwidth limits:`, error);
+        this.container.kill().catch(() => { });
+        this.container.remove().catch(() => { });
+        await networkLimitService.clearBandwidthLimit(this.container.id);
+        throw error;
+      }
+    }
+
     // Listen to events
     this.container.wait(() => this.stop());
   }
 
   public async onStop() {
+    const containerId = this.container?.id;
+
     try {
       await this.container?.kill();
     } catch (error) { }
     try {
       await this.container?.remove();
     } catch (error) { }
+
+    if (containerId) {
+      try {
+        await NetworkLimitService.getInstance().clearBandwidthLimit(containerId);
+      } catch (error) { }
+    }
   }
 
   public getContainer() {
